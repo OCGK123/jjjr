@@ -1,0 +1,1963 @@
+// 리플 효과
+    function createRipple(e) {
+      const button = e.currentTarget;
+      
+      const circle = document.createElement('span');
+      const diameter = Math.max(button.clientWidth, button.clientHeight);
+      const radius = diameter / 2;
+      
+      circle.style.width = circle.style.height = `${diameter}px`;
+      circle.style.left = `${e.clientX - button.getBoundingClientRect().left - radius}px`;
+      circle.style.top = `${e.clientY - button.getBoundingClientRect().top - radius}px`;
+      circle.classList.add('ripple');
+      
+      const ripple = button.getElementsByClassName('ripple')[0];
+      
+      if (ripple) {
+        ripple.remove();
+      }
+      
+      button.appendChild(circle);
+    }
+
+    // 검색 디바운스
+    function debounce(func, wait) {
+      let timeout;
+      return function() {
+        const context = this;
+        const args = arguments;
+        clearTimeout(timeout);
+        timeout = setTimeout(() => {
+          func.apply(context, args);
+        }, wait);
+      };
+    }
+
+    // DOMContentLoaded에서 저장된 테마 로드
+    document.addEventListener('DOMContentLoaded', loadSavedTheme);
+  </script>
+</body>
+</html><!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>진채형파일아카이브</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <style>
+    @font-face {
+      font-family: 'Paperlogy-8ExtraBold';
+      src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/2408-3@1.0/Paperlogy-8ExtraBold.woff2') format('woff2');
+      font-weight: 800;
+      font-style: normal;
+    }
+    :root {
+      --glass-bg: rgba(255, 255, 255, 0.1);
+      --glass-border: rgba(255, 255, 255, 0.2);
+      --accent: #8a2be2;
+      --secondary: #00b4d8;
+      --neon-glow: 0 0 10px rgba(138, 43, 226, 0.6);
+      --btn-border: 2px solid rgba(255, 255, 255, 0.3);
+    }
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    body {
+      font-family: -apple-system, system-ui, sans-serif;
+      background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+      color: #fff;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+    h1, h2, h3, h4, .btn, .title-font {
+      font-family: 'Paperlogy-8ExtraBold', sans-serif;
+    }
+
+    /* 배경 효과 */
+    .particles-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      z-index: -1;
+    }
+    .particle {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(30px);
+      pointer-events: none;
+      opacity: 0;
+      animation: fadeIn 1.5s ease forwards;
+      box-shadow: 0 0 80px rgba(255, 255, 255, 0.1) inset;
+    }
+    @keyframes fadeIn {
+      0% { opacity: 0; }
+      100% { opacity: 1; }
+    }
+    .bg-glow {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle at 50% 50%, rgba(121, 40, 202, 0.3), transparent 70%);
+      z-index: -2;
+      pointer-events: none;
+      animation: pulseGlow 10s infinite alternate;
+    }
+    @keyframes pulseGlow {
+      0% { opacity: 0.6; transform: scale(1); }
+      50% { opacity: 1; transform: scale(1.05); }
+      100% { opacity: 0.6; transform: scale(1); }
+    }
+
+    /* 글래스모피즘 요소 */
+    .glass-panel {
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 20px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    }
+    .glass-card {
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+      transition: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      position: relative;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    }
+    .glass-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      border-radius: 16px;
+      padding: 2px;
+      background: linear-gradient(120deg, rgba(255,255,255,0.5), rgba(255,255,255,0) 40%, rgba(255,255,255,0) 60%, rgba(255,255,255,0.5));
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.4s ease;
+    }
+    .glass-card:hover {
+      transform: translateY(-10px) scale(1.03);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      background: rgba(255, 255, 255, 0.15);
+    }
+    .glass-card:hover::before {
+      opacity: 1;
+      animation: shineEffect 2s infinite;
+    }
+    @keyframes shineEffect {
+      0% { background-position: -100% 0; }
+      100% { background-position: 200% 0; }
+    }
+
+    /* 로딩 표시 */
+    .preloader {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+      z-index: 9999;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+    }
+    .preloader-icon {
+      width: 80px;
+      height: 80px;
+      position: relative;
+    }
+    .preloader-icon div {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border: 4px solid transparent;
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    .preloader-icon div:nth-child(1) { animation-delay: 0s; }
+    .preloader-icon div:nth-child(2) {
+      border-top-color: var(--secondary);
+      animation-delay: 0.25s;
+      width: 70%;
+      height: 70%;
+      top: 15%;
+      left: 15%;
+    }
+    .preloader-icon div:nth-child(3) {
+      border-top-color: #ffffff;
+      animation-delay: 0.5s;
+      width: 40%;
+      height: 40%;
+      top: 30%;
+      left: 30%;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    .preloader-text {
+      margin-top: 20px;
+      font-family: 'Paperlogy-8ExtraBold', sans-serif;
+      font-size: 1.5rem;
+      background: linear-gradient(90deg, #e3f2fd, #90caf9, #42a5f5);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      animation: shimmer 2s infinite linear;
+      background-size: 200% 100%;
+    }
+    @keyframes shimmer {
+      0% { background-position: -100% 0; }
+      100% { background-position: 100% 0; }
+    }
+
+    /* 비밀번호 모달 */
+    .password-container {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1000;
+      backdrop-filter: blur(8px);
+      background: rgba(0, 0, 0, 0.4);
+      align-items: center;
+      justify-content: center;
+    }
+    .password-modal {
+      width: 90%;
+      max-width: 450px;
+      padding: 3rem;
+      text-align: center;
+      animation: modalFadeIn 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    }
+    @keyframes modalFadeIn {
+      0% { opacity: 0; transform: scale(0.9) rotateX(-10deg); }
+      100% { opacity: 1; transform: scale(1) rotateX(0); }
+    }
+    .password-modal h2 {
+      margin-bottom: 1.5rem;
+      font-weight: 800;
+      background: linear-gradient(90deg, #e3f2fd, #90caf9, #42a5f5);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      font-size: 2rem;
+      animation: shimmer 3s infinite linear;
+      background-size: 200% 100%;
+    }
+    .password-input-group {
+      position: relative;
+      margin-bottom: 1.5rem;
+    }
+    .password-input {
+      width: 100%;
+      padding: 1.2rem 1.2rem 1.2rem 3rem;
+      border-radius: 12px;
+      border: var(--btn-border);
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(5px);
+      color: white;
+      font-size: 1.1rem;
+      font-weight: 500;
+      letter-spacing: 1px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+    .password-input:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(138, 43, 226, 0.3), var(--neon-glow);
+    }
+    .password-input-icon {
+      position: absolute;
+      left: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: rgba(255, 255, 255, 0.7);
+    }
+    .submit-button {
+      background: linear-gradient(135deg, var(--accent), var(--secondary));
+      color: white;
+      border: var(--btn-border);
+      border-radius: 12px;
+      padding: 1rem 2rem;
+      font-weight: 700;
+      font-size: 1.1rem;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(138, 43, 226, 0.3);
+      width: 100%;
+      letter-spacing: 0.5px;
+      position: relative;
+      overflow: hidden;
+    }
+    .submit-button:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 7px 20px rgba(138, 43, 226, 0.4), var(--neon-glow);
+    }
+    .submit-button:active {
+      transform: translateY(1px);
+    }
+    .submit-button .ripple {
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.4);
+      transform: scale(0);
+      animation: ripple 0.6s linear;
+    }
+    @keyframes ripple {
+      to {
+        transform: scale(4);
+        opacity: 0;
+      }
+    }
+
+    /* 메인 컨텐츠 */
+    .page-container {
+      display: none;
+      min-height: 100vh;
+      padding: 2rem 1rem;
+      animation: fadeUpIn 0.8s ease-out;
+    }
+    @keyframes fadeUpIn {
+      0% { opacity: 0; transform: translateY(20px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+    .header {
+      text-align: center;
+      margin-bottom: 2rem;
+      position: relative;
+    }
+    .page-title {
+      font-size: 3rem;
+      font-weight: 800;
+      margin-bottom: 1rem;
+      background: linear-gradient(90deg, #9c27b0, #3f51b5, #2196f3);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      animation: titleGlow 3s ease-in-out infinite alternate;
+      display: inline-block;
+      position: relative;
+      text-transform: uppercase;
+      padding: 0.5rem 0;
+    }
+    .page-title::after {
+      content: '';
+      position: absolute;
+      left: 50%;
+      bottom: -5px;
+      width: 150px;
+      height: 4px;
+      background: linear-gradient(90deg, #9c27b0, #2196f3);
+      transform: translateX(-50%);
+      border-radius: 4px;
+      box-shadow: 0 0 15px rgba(156, 39, 176, 0.7);
+      animation: pulseWidth 3s infinite alternate;
+    }
+    @keyframes pulseWidth {
+      0% { width: 100px; opacity: 0.7; }
+      100% { width: 200px; opacity: 1; }
+    }
+    @keyframes titleGlow {
+      0% { text-shadow: 0 0 10px rgba(156, 39, 176, 0.5), 0 0 30px rgba(33, 150, 243, 0.3); }
+      50% { text-shadow: 0 0 20px rgba(156, 39, 176, 0.7), 0 0 40px rgba(33, 150, 243, 0.5); }
+      100% { text-shadow: 0 0 30px rgba(156, 39, 176, 0.9), 0 0 50px rgba(33, 150, 243, 0.7); }
+    }
+    .page-subtitle {
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    /* 컨트롤 패널 */
+    .control-panel {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      margin-bottom: 2rem;
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(10px);
+      padding: 1rem;
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .search-container {
+      flex: 1;
+      position: relative;
+      min-width: 300px;
+    }
+    .search-input {
+      width: 100%;
+      padding: 1rem 1.2rem 1rem 3rem;
+      border-radius: 12px;
+      border: var(--btn-border);
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(5px);
+      color: white;
+      font-size: 1.1rem;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+    .search-input:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(138, 43, 226, 0.3);
+    }
+    .search-icon {
+      position: absolute;
+      left: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: rgba(255, 255, 255, 0.7);
+    }
+    .filter-dropdown {
+      background: rgba(255, 255, 255, 0.1);
+      border: var(--btn-border);
+      border-radius: 12px;
+      padding: 0.75rem 1rem;
+      color: white;
+      min-width: 150px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+    .filter-dropdown option {
+      background: #302b63;
+      color: white;
+    }
+    .view-toggle {
+      display: flex;
+    }
+    .view-btn {
+      background: rgba(255, 255, 255, 0.1);
+      border: var(--btn-border);
+      border-radius: 12px;
+      padding: 0.75rem 1rem;
+      color: white;
+      cursor: pointer;
+      margin: 0 5px;
+    }
+    .view-btn.active {
+      background: rgba(138, 43, 226, 0.4);
+      border-color: var(--accent);
+      box-shadow: var(--neon-glow);
+    }
+
+    /* 테마 토글 */
+    .theme-toggle {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 100;
+      background: rgba(255, 255, 255, 0.1);
+      border: var(--btn-border);
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+    .theme-toggle:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3), var(--neon-glow);
+    }
+    .theme-toggle i {
+      font-size: 1.5rem;
+      color: white;
+      transition: transform 0.5s ease;
+    }
+    .theme-toggle:hover i {
+      transform: rotate(30deg);
+    }
+
+    /* 콘텐츠 래퍼 */
+    .content-wrapper {
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem;
+      min-height: 70vh;
+      position: relative;
+    }
+
+    /* 아이템 그리드 뷰 */
+    .items-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1.5rem;
+      margin-top: 1rem;
+    }
+    .item-card {
+      height: 100%;
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    .item-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 1.2rem;
+    }
+    .item-icon {
+      width: 50px;
+      height: 50px;
+      border-radius: 12px;
+      object-fit: cover;
+      margin-right: 1rem;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      transition: transform 0.3s ease;
+    }
+    .item-card:hover .item-icon {
+      transform: rotate(5deg) scale(1.1);
+    }
+    .item-title {
+      font-weight: 700;
+      font-size: 1.15rem;
+      color: white;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+      flex: 1;
+    }
+    .item-card:hover .item-title {
+      color: #90caf9;
+    }
+    .item-buttons {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 1rem;
+    }
+    .item-button {
+      flex: 1;
+      padding: 0.9rem;
+      border: var(--btn-border);
+      border-radius: 12px;
+      background: linear-gradient(135deg, rgba(156, 39, 176, 0.7), rgba(33, 150, 243, 0.7));
+      color: white;
+      font-weight: 700;
+      cursor: pointer;
+      backdrop-filter: blur(5px);
+      transition: all 0.4s cubic-bezier(.2,.8,.2,1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
+      letter-spacing: 0.5px;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+    }
+    .item-button:hover {
+      background: linear-gradient(135deg, rgba(156, 39, 176, 1), rgba(33, 150, 243, 1));
+      transform: translateY(-5px) scale(1.03);
+      box-shadow: 0 10px 20px rgba(33, 150, 243, 0.4), 
+                  0 0 20px rgba(138, 43, 226, 0.4);
+      letter-spacing: 1px;
+    }
+    .item-button:active {
+      transform: translateY(2px);
+      transition: all 0.1s;
+    }
+    .item-button::after {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: linear-gradient(
+        rgba(255, 255, 255, 0),
+        rgba(255, 255, 255, 0),
+        rgba(255, 255, 255, 0.1),
+        rgba(255, 255, 255, 0)
+      );
+      transform: rotate(30deg);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .item-button:hover::after {
+      opacity: 1;
+      animation: shimmerButton 2s infinite;
+    }
+    @keyframes shimmerButton {
+      0% { transform: translateX(-100%) rotate(30deg); }
+      100% { transform: translateX(100%) rotate(30deg); }
+    }
+    .favorite-btn {
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.1);
+      border: var(--btn-border);
+      color: white;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    .favorite-btn.active {
+      background: rgba(255, 59, 59, 0.3);
+      color: #ff5757;
+      border-color: rgba(255, 107, 107, 0.6);
+    }
+    .favorite-btn.active i {
+      transform: scale(1.2);
+    }
+
+    /* 아이템 리스트 뷰 */
+    .items-list {
+      display: none;
+      flex-direction: column;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+    .item-row {
+      display: flex;
+      align-items: center;
+      padding: 1rem;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      transition: all 0.3s ease;
+      opacity: 0;
+      transform: translateX(-20px);
+    }
+    .item-row:hover {
+      background: rgba(255, 255, 255, 0.12);
+      border-color: rgba(255, 255, 255, 0.3);
+      transform: translateY(-3px) !important;
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    }
+    .item-row .item-icon {
+      width: 40px;
+      height: 40px;
+    }
+    .item-row .item-title {
+      margin: 0 1rem;
+      flex: 1;
+    }
+    .item-row .item-buttons {
+      margin-top: 0;
+      width: auto;
+    }
+
+    /* 카테고리 */
+    .categories {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin: 1.5rem 0;
+      justify-content: center;
+    }
+    .category-pill {
+      padding: 0.5rem 1rem;
+      border-radius: 50px;
+      background: rgba(255, 255, 255, 0.1);
+      border: var(--btn-border);
+      color: white;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 0.9rem;
+    }
+    .category-pill:hover, .category-pill.active {
+      background: rgba(138, 43, 226, 0.4);
+      border-color: var(--accent);
+      box-shadow: var(--neon-glow);
+      transform: translateY(-2px);
+    }
+
+    /* 즐겨찾기 섹션 */
+    .favorites-section {
+      margin-bottom: 2rem;
+      display: none;
+    }
+    .section-title {
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+      color: white;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .section-title i {
+      color: #ff5757;
+    }
+
+    /* 백투탑 버튼 */
+    .back-to-top {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), var(--secondary));
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+      border: var(--btn-border);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      z-index: 10;
+    }
+    .back-to-top.visible {
+      opacity: 1;
+      visibility: visible;
+    }
+    .back-to-top:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3), var(--neon-glow);
+    }
+
+    /* 로딩 스피너 */
+    .loading-spinner {
+      width: 50px;
+      height: 50px;
+      border: 3px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top-color: var(--accent);
+      animation: spin 1s ease-in-out infinite;
+      margin: 2rem auto;
+    }
+
+    /* 결과 없음 메시지 */
+    .no-results {
+      text-align: center;
+      padding: 2rem;
+      font-size: 1.2rem;
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    /* 툴팁 스타일 */
+    .tooltip {
+      position: relative;
+    }
+    .tooltip:hover::after {
+      content: attr(data-tooltip);
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 0.5rem 1rem;
+      background: rgba(0, 0, 0, 0.8);
+      color: white;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      white-space: nowrap;
+      z-index: 10;
+      pointer-events: none;
+      backdrop-filter: blur(5px);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    /* 단축키 버튼 & 모달 */
+    .shortcuts-btn {
+      position: fixed;
+      bottom: 30px;
+      left: 30px;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, rgba(156, 39, 176, 0.8), rgba(33, 150, 243, 0.8));
+      border: var(--btn-border);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 100;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+      transition: all 0.3s ease;
+    }
+    .shortcuts-btn:hover {
+      transform: scale(1.1);
+      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4), var(--neon-glow);
+    }
+    .shortcuts-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      z-index: 1001;
+      backdrop-filter: blur(8px);
+      align-items: center;
+      justify-content: center;
+      animation: modalFadeIn 0.3s ease;
+    }
+    .shortcuts-content {
+      width: 90%;
+      max-width: 600px;
+      padding: 2.5rem;
+      border-radius: 20px;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+      transform: translateY(20px);
+      animation: modalSlideIn 0.5s cubic-bezier(0.2, 0.9, 0.3, 1.2) forwards;
+    }
+    @keyframes modalSlideIn {
+      from { transform: translateY(50px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    .shortcuts-title {
+      font-size: 1.8rem;
+      margin-bottom: 1.5rem;
+      text-align: center;
+      background: linear-gradient(90deg, #9c27b0, #2196f3);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      text-shadow: 0 0 15px rgba(156, 39, 176, 0.5);
+    }
+    .shortcuts-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.2rem;
+    }
+    .shortcut-item {
+      display: flex;
+      align-items: center;
+      margin-bottom: 1rem;
+      transition: all 0.2s ease;
+    }
+    .shortcut-item:hover {
+      transform: translateX(5px);
+    }
+    .key {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 0.4rem 0.9rem;
+      border-radius: 8px;
+      margin-right: 1rem;
+      font-family: monospace;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+      font-weight: bold;
+      min-width: 30px;
+      text-align: center;
+    }
+    .close-modal {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      color: white;
+      font-size: 1.2rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+    }
+    .close-modal:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: rotate(90deg);
+    }
+
+    /* 반응형 디자인 */
+    @media (max-width: 768px) {
+      .page-title { font-size: 2rem; }
+      .page-subtitle { font-size: 1.2rem; }
+      .content-wrapper { padding: 1.5rem; }
+      .control-panel { flex-direction: column; }
+      .search-container { width: 100%; }
+      .items-grid { grid-template-columns: 1fr; }
+      .theme-toggle, .shortcuts-btn {
+        width: 40px;
+        height: 40px;
+      }
+      .back-to-top {
+        bottom: 20px;
+        right: 20px;
+      }
+    }
+
+    /* 라이트 모드 테마 */
+    body.light-mode {
+      background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
+      color: #333;
+    }
+    body.light-mode .glass-panel,
+    body.light-mode .glass-card {
+      background: rgba(255, 255, 255, 0.7);
+      border-color: rgba(255, 255, 255, 0.8);
+    }
+    body.light-mode .item-title {
+      color: #333;
+      text-shadow: none;
+    }
+    body.light-mode .password-input,
+    body.light-mode .search-input {
+      background: rgba(255, 255, 255, 0.5);
+      color: #333;
+    }
+    body.light-mode .password-input::placeholder,
+    body.light-mode .search-input::placeholder {
+      color: rgba(0, 0, 0, 0.5);
+    }
+    body.light-mode .password-input-icon,
+    body.light-mode .search-icon {
+      color: rgba(0, 0, 0, 0.5);
+    }
+
+    /* 커스텀 스크롤바 */
+    ::-webkit-scrollbar {
+      width: 10px;
+    }
+    ::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 10px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
+  </style>
+</head>
+<body>
+  <!-- 프리로더 -->
+  <div class="preloader" id="preloader">
+    <div class="preloader-icon">
+      <div></div>
+      <div></div>
+      <div></div>
+    </div>
+    <div class="preloader-text">로딩 중...</div>
+  </div>
+
+  <!-- 배경 애니메이션 -->
+  <div class="particles-container" id="particles"></div>
+  <div class="bg-glow"></div>
+
+  <!-- 테마 토글 -->
+  <div class="theme-toggle" id="themeToggle" data-tooltip="테마 변경">
+    <i class="fas fa-moon"></i>
+  </div>
+
+  <!-- 비밀번호 모달 -->
+  <div class="password-container" id="passwordContainer">
+    <div class="glass-panel password-modal">
+      <h2>비밀번호를 입력해주세요!</h2>
+      <div class="password-input-group">
+        <i class="fas fa-lock password-input-icon"></i>
+        <input type="password" id="passwordInput" class="password-input" placeholder="비밀번호 입력..." />
+      </div>
+      <button class="submit-button" id="submitButton">
+        <i class="fas fa-sign-in-alt"></i> 입장하기
+      </button>
+    </div>
+  </div>
+
+  <!-- 키보드 단축키 버튼 & 모달 -->
+  <div class="shortcuts-btn" id="shortcutsBtn" data-tooltip="단축키">
+    <i class="fas fa-keyboard"></i>
+  </div>
+  
+  <div class="shortcuts-modal" id="shortcutsModal">
+    <div class="glass-panel shortcuts-content">
+      <h2 class="shortcuts-title">키보드 단축키</h2>
+      <button class="close-modal" id="closeShortcuts">
+        <i class="fas fa-times"></i>
+      </button>
+      <div class="shortcuts-list">
+        <div class="shortcut-item">
+          <span class="key">/</span>
+          <span>검색창 포커스</span>
+        </div>
+        <div class="shortcut-item">
+          <span class="key">F</span>
+          <span>즐겨찾기 표시/숨기기</span>
+        </div>
+        <div class="shortcut-item">
+          <span class="key">G</span>
+          <span>그리드 뷰</span>
+        </div>
+        <div class="shortcut-item">
+          <span class="key">L</span>
+          <span>리스트 뷰</span>
+        </div>
+        <div class="shortcut-item">
+          <span class="key">T</span>
+          <span>테마 변경</span>
+        </div>
+        <div class="shortcut-item">
+          <span class="key">?</span>
+          <span>단축키 도움말</span>
+        </div>
+        <div class="shortcut-item">
+          <span class="key">ESC</span>
+          <span>모달 닫기</span>
+        </div>
+        <div class="shortcut-item">
+          <span class="key">↑</span>
+          <span>맨 위로 이동</span>
+        </div>
+        <div class="shortcut-item">
+          <span class="key">Space</span>
+          <span>페이지 아래로</span>
+        </div>
+        <div class="shortcut-item">
+          <span class="key">N</span>
+          <span>다음 항목으로</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 메인 컨텐츠 -->
+  <div class="page-container" id="pageContainer">
+    <div class="header">
+      <h1 class="page-title">진채형파일아카이브</h1>
+      <h2 class="page-subtitle">여러 게임 + Vpn</h2>
+    </div>
+    
+    <div class="control-panel">
+      <div class="search-container">
+        <i class="fas fa-search search-icon"></i>
+        <input type="text" id="searchInput" class="search-input" placeholder="앱 이름 검색..." />
+      </div>
+      
+      <select class="filter-dropdown" id="filterCategory">
+        <option value="all">모든 카테고리</option>
+        <option value="DS">닌텐도 DS</option>
+        <option value="Wii">닌텐도 Wii</option>
+        <option value="VPN">VPN / 프록시</option>
+        <option value="Other">기타</option>
+      </select>
+      
+      <div class="view-toggle">
+        <button class="view-btn active" id="gridViewBtn" data-tooltip="그리드 뷰">
+          <i class="fas fa-th"></i>
+        </button>
+        <button class="view-btn" id="listViewBtn" data-tooltip="리스트 뷰">
+          <i class="fas fa-list"></i>
+        </button>
+      </div>
+    </div>
+    
+    <div class="categories" id="categoryTags">
+      <!-- 카테고리 태그가 여기에 삽입됩니다 -->
+    </div>
+    
+    <div class="favorites-section" id="favoritesSection">
+      <h3 class="section-title"><i class="fas fa-heart"></i> 즐겨찾기 <small style="font-size: 0.7em; opacity: 0.7;">(세션 전용)</small></h3>
+      <div class="items-grid" id="favoritesGrid"></div>
+    </div>
+    
+    <div class="glass-panel content-wrapper">
+      <div class="items-grid" id="itemsGrid">
+        <!-- 아이템이 여기에 삽입됩니다 -->
+        <div class="loading-spinner"></div>
+      </div>
+      
+      <div class="items-list" id="itemsList">
+        <!-- 리스트 뷰 아이템이 여기에 삽입됩니다 -->
+      </div>
+    </div>
+    
+    <div class="back-to-top" id="backToTop" data-tooltip="맨 위로">
+      <i class="fas fa-arrow-up"></i>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // 아이템 데이터 (원본 코드에서)
+    const ITEMS = [
+      {
+        icon: "https://tse3.mm.bing.net/th/id/OIP.t8f1Eq2m6okGkEGyrSRJvAHaEK?w=309&h=180&c=7&r=0&o=5&pid=1.7",
+        title: "프로톤VPN (가입필요)",
+        url: "https://vpn.protondownload.com/download/ProtonVPN_v3.3.2.exe",
+        category: "VPN"
+      },
+      {
+        icon: "https://th.bing.com/th/id/R.2a527448abbb085f6c89793cfb5f65f5?rik=A7ss82CSOJPrkg&riu=http%3a%2f%2fvignette2.wikia.nocookie.net%2fgeometry-dash%2fimages%2f9%2f90%2fGeometryDash.png%2frevision%2flatest%3fcb%3d20160224042843&ehk=Hvk2rFdCmF08iQinZYieMsLbvo4NDNdKYic8xB6GqZE%3d&risl=&pid=ImgRaw&r=0",
+        title: "지오메트리대쉬",
+        url: "https://drive.usercontent.google.com/download?id=10pkH8IYH58pvl9awiittamCXoO9WhHO9&export=download",
+        category: "Other"
+      },
+      {
+        icon: "https://th.bing.com/th?id=OIP.-2gC__2Z5ZUd_YHJsXUSIQAAAA&w=249&h=250&c=8&rs=1&qlt=90&o=6&cb=13&pid=3.1&rm=2",
+        title: "오페라 GX 브라우저",
+        url: "https://drive.usercontent.google.com/download?id=1kJKMHEUNofV-jJnPf2_K4p0L1g4Sy7C-&export=download&authuser=3",
+        category: "Other"
+      },
+      {
+        icon: "https://cdn-icons-png.flaticon.com/128/4893/4893114.png",
+        title: "급식조회 (경공고정)",
+        url: "http://jch.kro.kr/",
+        category: "Other"
+      },
+      {
+        icon: "https://cdn-icons-png.flaticon.com/128/4893/4893114.png",
+        title: "급식조회 앱 다운",
+        url: "https://drive.usercontent.google.com/download?id=1FY2_OOuUYXwSyfQJjRoXbIGZECyZ-48N&export=download&authuser=0",
+        category: "Other"
+      },
+      {
+        icon: "https://tse2.mm.bing.net/th/id/OIP.ShZ6WScsEFdO1Yb5NzuNHwHaEI?w=840&h=469&rs=1&pid=ImgDetMain",
+        title: "철권6",
+        url: "https://drive.usercontent.google.com/download?id=0B5kIILfG3p8INVg2TFVocUxkVVk&export=download&authuser=0",
+        category: "Other"
+      },
+      {
+        icon: "https://eaglercraft.com/mc/1.8.8/",
+        title: "마인크래프트 1.8.8",
+        url: "https://eaglercraft.com/mc/1.8.8/",
+        category: "Other"
+      },
+      {
+        icon: "https://tse1.mm.bing.net/th/id/OIP.QFf68XBnto3qJ7tqNErjZgHaGu?rs=1&pid=ImgDetMain",
+        title: "닌텐도 DS 에뮬",
+        url: "https://drive.usercontent.google.com/u/0/uc?id=1OZNNxC6S_CpOyOp66LHzJngteo_ZjpLR&export=download",
+        category: "DS"
+      },
+      {
+        icon: "https://i.namu.wiki/i/IK8mUq98AkoWn926Kusal5HoqpuXmNKm0y52DMIRYIQO_2clPa8KfjZXaRhooz4u8vaHYvUWNHXUAeP9sbnMFw.webp",
+        title: "슈퍼마리오 (DS)",
+        url: "https://drive.usercontent.google.com/u/0/uc?id=1RmP1AuqXuwHYkzhfrT1m5HobO3S68YOd&export=download",
+        category: "DS"
+      },
+      {
+        icon: "https://i.namu.wiki/i/uJ8C5vxNjrI-tB1bu_3zATdYzYzRQcdlvqZEpALWPwmbPRlt1GexU8JxC9pzDUc0uYjVPaGLZylLlF95YqQHFw.webp",
+        title: "포켓몬 화이트 (DS)",
+        url: "https://drive.google.com/uc?id=1rpxKQs-QJwztR0seBDH8bKUZ_vi9lktG&export=download",
+        category: "DS"
+      },
+      {
+        icon: "https://i.namu.wiki/i/21zBjDhh81iPDbKpDUh62wgoENWI9Fi_C1ldzizcmwsNgbuwwkbsw6fJqClNp0g7k7tXD6tjaMM69UrKV0vkAA.webp",
+        title: "포켓몬 블랙 (DS)",
+        url: "https://drive.google.com/uc?id=100SPGRZvG4TjPTxDU0V69r7mPA3nvGvf&export=download",
+        category: "DS"
+      },
+      {
+        icon: "https://img.danawa.com/prod_img/500000/795/953/img/1953795_1.jpg?_v=20161221141913",
+        title: "와리오 (DS)",
+        url: "https://drive.usercontent.google.com/uc?id=1-skzxeAaLumFN9oN__uPTyjMqn7yGnrJ&export=download",
+        category: "DS"
+      },
+      {
+        icon: "https://img.danawa.com/prod_img/500000/691/975/img/1975691_1.jpg?_v=20151119102421",
+        title: "리듬히어로 (DS)",
+        url: "https://drive.usercontent.google.com/download?id=1FILA3W2Lzl-fTzHmBEEzFsVTkkyiscjQ&export=download&authuser=0",
+        category: "DS"
+      },
+      {
+        icon: "https://img.danawa.com/prod_img/500000/388/927/img/927388_1.jpg?_v=20190207181514",
+        title: "리듬세상 (DS)",
+        url: "https://drive.google.com/file/d/1-XKqAI-MsyfLudtSEUXqvibKTwNg43OE/view",
+        category: "DS"
+      },
+      {
+        icon: "https://mblogthumb-phinf.pstatic.net/20160813_19/minjaeofstar_1471083162621BkCjc_JPEG/mcds070405_01_hosipw.jpg?type=w420",
+        title: "마리오카트 (DS)",
+        url: "https://drive.usercontent.google.com/uc?id=0BzpZCKYa71okTUdNU0JWNEllMVU&export=download&resourcekey=0--KXRREfTw2Bwgcjl2kzs6A",
+        category: "DS"
+      },
+      {
+        icon: "https://i.namu.wiki/i/mM9REnYN7HuRw9U7HGBCOTtamSt9tt3EAisvI8UuLxrFYi8ttwF_xPg3cy5BzpVWR2DJozj0H0fAtpXls_tKWQ.webp",
+        title: "포켓몬 화이트2(DS)",
+        url: "https://drive.usercontent.google.com/download?id=1v3qBwrN49Ntf6fCCOqzfbjRv-_2alBCa&export=download&authuser=0",
+        category: "DS"
+      },
+      {
+        icon: "https://i.namu.wiki/i/YlUne4SpGZJbhOeuD-8UKwQOYd1EEUGPWqWPi5M7x0t2h1pNRqpZ4W90WIH69_ohQeTaZlWe92XsYu1hCyun-A.webp",
+        title: "포켓몬 블랙2(DS)",
+        url: "https://drive.usercontent.google.com/download?id=1Xe6ENFnIU2Ydu-ResrDFnhucQFoD90c6&export=download&authuser=0",
+        category: "DS"
+      },
+      {
+        icon: "https://i.namu.wiki/i/zKLIqvxvam7_WUbx7HaGZmOPMgo_b53jvhi2OrFlIYyvt0fAi1CgdCO5eo2cT-_v07Ta4byzzt0iyQJW2KyY7A.webp",
+        title: "포켓몬 소울실버(DS)",
+        url: "https://drive.usercontent.google.com/download?id=1QySQrSw5MOd3YAC2B5n5jK-YKx_9fVN1&export=download&authuser=0",
+        category: "DS"
+      },
+      {
+        icon: "https://i.namu.wiki/i/qOh8xRWB1_DH6vop4SRI1F_LF86I7dAiYf3-DOLzzYMHtT4xi9TfEZLhxvdEYYeAMtUiTdwecTcAnnpA7ukbxw.webp",
+        title: "포켓몬 디아루가(DS)",
+        url: "https://drive.google.com/file/d/1Rl-y7Oc7feL4A4eDud2R-3kA9MLg6gyl/view",
+        category: "DS"
+      },
+      {
+        icon: "https://i.namu.wiki/i/eW7OK-A_RYmdEL1K6188P-Mp9RWowmsFYpfHZZxzqjH8MVD0nYAU5FWu2VQZ9tww1eyzEv_vXZUba1BlK-xm3Q.webp",
+        title: "포켓몬 펄기아(DS)",
+        url: "https://drive.google.com/file/d/1YaLrOR-8hLa1FJhMdXJOHasdHw11xTsB/view",
+        category: "DS"
+      },
+      {
+        icon: "https://i.namu.wiki/i/21zBjDhh81iPDbKpDUh62wgoENWI9Fi_C1ldzizcmwsNgbuwwkbsw6fJqClNp0g7k7tXD6tjaMM69UrKV0vkAA.webp",
+        title: "짱구 크레용대작전(DS)",
+        url: "https://drive.google.com/file/d/1QavLbPk-jE7LuMo2RP6Iq6r7LkrHXYha/view",
+        category: "DS"
+      },
+      {
+        icon: "https://i.namu.wiki/i/Lle15DbVOMqmLsYiND-gcGukb1duSl4SNL00VUZV0TuCxbNP21WDBSrt5-gQDlNly8Cw6EUefi4GHx5cDERVgg.webp",
+        title: "짱구 시네마랜드(DS)",
+        url: "https://drive.google.com/file/d/1IG-KH9jQPYCGOd9wwlzJ2U_R2epxyBGY/view",
+        category: "DS"
+      },
+      {
+        icon: "https://img.danawa.com/prod_img/500000/238/874/img/1874238_1.jpg?_v=20160727121344&shrink=360:360",
+        title: "짱구 고무찰흙(DS)",
+        url: "https://drive.google.com/file/d/1ADggzBxN0c132BUNxwuP1lkINcjPiaR4/view",
+        category: "DS"
+      },
+      {
+        icon: "https://i.namu.wiki/i/9DfH-5uAbsXoMiGEpfws-SlUHf8dEBpAjWjz1u6t38VVTemSzJ7cag2rLpqZ2pUZnNh1PHRNM-1vRxZtl0mung.webp",
+        title: "젤다 모래시계(DS)",
+        url: "https://drive.google.com/file/d/1xm66jqRlg15nxqEJe9BVwzgfMFZp482r/view",
+        category: "DS"
+      },
+      {
+        icon: "https://i.namu.wiki/i/3xXl68B1XfGD5Mvqq7c4-yAnNZ-EwQxdW_MdBmsOC-oC9BkHdKDWwc9vDq_003JdxkP-kuueu4P5SPwg2Xs5Tw.webp",
+        title: "마법천자문(DS)",
+        url: "https://drive.google.com/file/d/1FVjwpC7DDvaFWOwc8wK0ri2vy9eOxWKA/view",
+        category: "DS"
+      },
+      {
+        icon: "https://img.danawa.com/prod_img/500000/406/684/img/684406_1.jpg?_v=20190207181841",
+        title: "스폰지밥과 친구들(DS)",
+        url: "https://drive.google.com/file/d/1VwnQ-bu8f6orlJDjH2a27LqErGQso8SQ/view",
+        category: "DS"
+      },
+      {
+        icon: "https://img.danawa.com/prod_img/500000/586/952/img/952586_1.jpg?_v=20160822110837",
+        title: "벤쿠버 동계올림픽(DS)",
+        url: "https://drive.google.com/file/d/1R2Cji5n-qz2OEjsshvFRKXiuNkeWKUIM/view",
+        category: "DS"
+      },
+      {
+        icon: "https://img.danawa.com/prod_img/500000/512/155/img/1155512_1.jpg?_v=20171102063010",
+        title: "나루토vs사스케(DS)",
+        url: "https://drive.google.com/file/d/1dBZdWEpQ8NPcyfp4HtdY5VpnNMw3DIc3/view",
+        category: "DS"
+      },
+      {
+        icon: "https://img.danawa.com/prod_img/large/group_848/424266_1.jpg?_v=20210601093828",
+        title: "포켓몬대시 (DS)",
+        url: "https://drive.google.com/file/d/1mtgkoSHbO0P3xXo0DuYVUUqxPaKjCdUg/view",
+        category: "DS"
+      },
+      {
+        icon: "https://image.yes24.com/momo/TopCate56/MidCate01/5503161.jpg",
+        title: "프로야구비긴즈 (DS)",
+        url: "https://drive.google.com/file/d/1G4el792oItpwKhD9ZLENUb5fmxe9PcXh/view",
+        category: "DS"
+      },
+      {
+        icon: "https://i.namu.wiki/i/bJlOyA7O5XW164HN8A0iQOxKVl2LFTbWPo5m6ss9I68rHr6UaC_rcfyKwDgYYQv1h6n0mlf74fLoFrTBsHdt9w.webp",
+        title: "마리오64 (DS)",
+        url: "https://drive.google.com/file/d/1mM0QXVlb6n-xbkaRZTxsiog_VQGnedt7/view",
+        category: "DS"
+      },
+      {
+        icon: "https://images.sftcdn.net/images/t_app-icon-m/p/8ddb70b6-a82c-4b5d-a668-400d3c4097f3/3005452743/dolphin-emulator-download%20(1).png",
+        title: "돌핀 에뮬 (Wii)",
+        url: "https://drive.usercontent.google.com/download?id=1bdUJEEwqx99KvMCGpc6Ir2LcEPKZmB0E&export=download&authuser=0",
+        category: "Wii"
+      },
+      {
+        icon: "https://i.namu.wiki/i/IYKt6LRjs97BZ1b3YVX7xp_89mT4OCwZ8vVYdv0eWf5GUd8kRMtxJVdh_V09wb98ITcMEhAmsH7mJi-0sKOCvw.webp",
+        title: "별의커비(Wii)",
+        url: "https://drive.google.com/file/d/15gc9gfzb0t3f5eXN-txIdN1-SAvTRCtI/view",
+        category: "Wii"
+      },
+      {
+        icon: "https://img.danawa.com/prod_img/500000/829/793/img/1793829_1.jpg?_v=20190719180323",
+        title: "마리오카트(Wii)",
+        url: "https://drive.google.com/file/d/1oVeGMcLEHfeDlhwomVA1KQev3Z-cBLzw/view",
+        category: "Wii"
+      },
+      {
+        icon: "https://i.namu.wiki/i/xdH13CPBhGs_xDDzdyHVajOfCSnp2_LElo0r5BB5wDAhomb6cJm02biExr3kZHnGx0f4dDnJvEnVXvt5d6y9aQ.webp",
+        title: "뉴슈퍼마리오(Wii)",
+        url: "https://drive.google.com/file/d/18xyGEKd6EetciHL4AD7n_blT64xbItDf/view",
+        category: "Wii"
+      },
+      {
+        icon: "https://i.namu.wiki/i/mo45tlkB2ORryX-FGXmiDSUSMfNFjI6Rt2sXmFPuqqT2Y7PStntA-nW5KpvGct6LcEYH72WB7YGSmGYLy-CrVQ.webp",
+        title: "리듬세상(Wii)",
+        url: "https://drive.google.com/file/d/1QyqKkkX3BGnB6CB0iP3L43yx_Q7HlH0T/view",
+        category: "Wii"
+      },
+      {
+        icon: "https://th.bing.com/th/id/OIP.lG93Mhbxo10kWSaIFSUMkQHaHa?rs=1&pid=ImgDetMain",
+        title: "(다운X)태고 의 달인 (23.01.06v)",
+        url: "https://cjdgrevival.com/",
+        category: "Other"
+      },
+      {
+        icon: "https://buckshotroulette.online/game-img.png",
+        title: "(다운X)벅샷룰렛 (1.5v)",
+        url: "https://buckshotroulette.online/game/ver15/",
+        category: "Other"
+      },
+      {
+        icon: "https://static.independent.co.uk/2021/07/15/13/A16I9125-Edit.jpg?width=1200&height=1200&fit=crop",
+        title: "니얼굴.mp3",
+        url: "https://drive.google.com/file/d/1CLdIEVNFhq7uw3LH7jKyO6b7zEK3phvm/view",
+        category: "Other"
+      },
+      {
+        icon: "https://flexible.img.hani.co.kr/flexible/normal/700/494/imgdb/original/2022/1211/20221211501579.jpg",
+        title: "카트라이더",
+        url: "https://drive.google.com/file/d/1-dpUvPLd-IFCtB7mO5ywGqZ2iTTNsT-G/view?usp=sharing",
+        category: "Other"
+      },
+      {
+        icon: "https://images.g2crowd.com/uploads/product/image/social_landscape/social_landscape_8e412f772704939d73c6eb7f49565adb/lumiproxy.png",
+        title: "무료 프록시(가입무필요)",
+        url: "https://www.lumiproxy.com/online-proxy/proxysite/",
+        category: "VPN"
+      },
+      {
+        icon: "https://lh3.googleusercontent.com/XG6Ofeh3jEayEoW0X_N7cXiSi2rmymPFkocdnXmsA2tjb1N2J5bCuLYGnNR9ViADK4qVF2JAl9kYMFq5POtBlKbdzzU=s60",
+        title: "가입무필요VPN",
+        url: "https://chromewebstore.google.com/detail/urban-vpn-proxy/eppiocemhmnlbhjplcgkofciiegomcon?hl=en",
+        category: "VPN"
+      },
+      {
+        icon: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR22kVO2eK8hw0RJ_5Tbw6Jwswx5h5NA12qhA&s",
+        title: "GTA 산안드레스 (EGG필요.)",
+        url: "https://drive.usercontent.google.com/download?id=1PRfEYawGUujwaQo9XH5cqfi7j2XSKP9P&export=download",
+        category: "Other"
+      },
+      {
+        icon: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTC6r7dXP4aXuaZVGfqRaXf_efMS7iI4nThtw&s",
+        title: "EGG 파일",
+        url: "https://advert.estsoft.com/?event=201005031094508",
+        category: "Other"
+      }
+    ];
+
+    // 세션 전용 즐겨찾기
+    let favorites = [];
+    const saveToLocalStorage = () => {
+      // 샌드박스 환경에서는 localStorage 사용 불가 - 세션 전용
+      console.log("즐겨찾기 업데이트 (세션 전용)");
+    };
+
+    // 프리로더
+    window.addEventListener('load', function() {
+      setTimeout(() => {
+        document.getElementById('preloader').style.opacity = '0';
+        setTimeout(() => {
+          document.getElementById('preloader').style.display = 'none';
+        }, 500);
+      }, 1000);
+    });
+
+    // 비밀번호 확인
+    const passwordContainer = document.getElementById('passwordContainer');
+    const pageContainer = document.getElementById('pageContainer');
+    const passwordInput = document.getElementById('passwordInput');
+    const submitButton = document.getElementById('submitButton');
+    const correctPassword = "wlswlswkfk";
+
+    document.addEventListener('DOMContentLoaded', function() {
+      // 비밀번호 화면 표시
+      passwordContainer.style.display = 'flex';
+      
+      // 배경 파티클 생성
+      createParticles();
+      animateParticles();
+      
+      // 카테고리 태그 생성
+      generateCategoryTags();
+      
+      // 비밀번호 검증
+      submitButton.addEventListener('click', validatePassword);
+      passwordInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+          validatePassword();
+        }
+      });
+      
+      // 뷰 토글 버튼
+      document.getElementById('gridViewBtn').addEventListener('click', function() {
+        switchView('grid');
+      });
+      
+      document.getElementById('listViewBtn').addEventListener('click', function() {
+        switchView('list');
+      });
+      
+      // 카테고리 필터
+      document.getElementById('filterCategory').addEventListener('change', function() {
+        filterItems();
+      });
+      
+      // 테마 토글
+      document.getElementById('themeToggle').addEventListener('click', toggleTheme);
+      
+      // 백투탑
+      window.addEventListener('scroll', toggleBackToTop);
+      document.getElementById('backToTop').addEventListener('click', scrollToTop);
+      
+      // 키보드 단축키
+      document.addEventListener('keydown', handleKeyboardShortcuts);
+      
+      // 단축키 모달
+      document.getElementById('shortcutsBtn').addEventListener('click', function() {
+        document.getElementById('shortcutsModal').style.display = 'flex';
+      });
+      
+      document.getElementById('closeShortcuts').addEventListener('click', function() {
+        document.getElementById('shortcutsModal').style.display = 'none';
+      });
+      
+      // 리플 효과
+      const buttons = document.querySelectorAll('.submit-button, .item-button');
+      buttons.forEach(button => {
+        button.addEventListener('click', createRipple);
+      });
+    });
+
+    // 비밀번호 검증
+    function validatePassword() {
+      if (passwordInput.value === correctPassword) {
+        // 애니메이션과 함께 비밀번호 화면 숨기기
+        passwordContainer.style.opacity = '0';
+        setTimeout(() => {
+          passwordContainer.style.display = 'none';
+          // 메인 컨텐츠 표시
+          pageContainer.style.display = 'block';
+          // 아이템 렌더링
+          renderItems(ITEMS);
+          checkFavorites();
+        }, 500);
+      } else {
+        // 잘못된 비밀번호 시 흔들림 애니메이션
+        submitButton.style.animation = 'none';
+        setTimeout(() => {
+          submitButton.style.animation = 'shake 0.5s ease';
+        }, 10);
+        passwordInput.style.borderColor = 'rgba(255, 0, 0, 0.5)';
+        passwordInput.style.boxShadow = '0 0 0 3px rgba(255, 0, 0, 0.2)';
+        
+        setTimeout(() => {
+          submitButton.style.animation = '';
+          passwordInput.style.borderColor = 'rgba(255, 255, 255, 0.2)';
+          passwordInput.style.boxShadow = 'none';
+        }, 500);
+      }
+    }
+
+    // 배경 파티클
+    function createParticles() {
+      const container = document.getElementById('particles');
+      const colors = [
+        'rgba(138, 43, 226, 0.4)', // 보라색
+        'rgba(0, 180, 216, 0.4)',  // 청록색
+        'rgba(156, 39, 176, 0.4)',  // 보라색
+        'rgba(33, 150, 243, 0.4)',  // 파란색
+        'rgba(233, 30, 99, 0.4)',   // 핑크색
+        'rgba(126, 87, 194, 0.4)',  // 진한 보라색
+        'rgba(3, 169, 244, 0.4)',   // 연한 파란색
+      ];
+      
+      for (let i = 0; i < 10; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'particle';
+        
+        // 랜덤 속성 - 크기 2배 증가
+        const size = Math.random() * 600 + 200;
+        const color = colors[Math.floor(Math.random() * colors.length)];
+        
+        // 윈도우 내에 랜덤 위치
+        const posX = Math.random() * (window.innerWidth - size/2);
+        const posY = Math.random() * (window.innerHeight - size/2);
+        
+        // 스타일 적용
+        particle.style.width = `${size}px`;
+        particle.style.height = `${size}px`;
+        particle.style.backgroundColor = color;
+        particle.style.left = `${posX}px`;
+        particle.style.top = `${posY}px`;
+        
+        // 초기 위치 및 이동 데이터 저장
+        particle.dataset.x = posX;
+        particle.dataset.y = posY;
+        particle.dataset.speedX = (Math.random() - 0.5) * 0.5;
+        particle.dataset.speedY = (Math.random() - 0.5) * 0.5;
+        
+        container.appendChild(particle);
+      }
+    }
+
+    function animateParticles() {
+      // 수정 및 단순화된 애니메이션 함수
+      let particles = document.querySelectorAll('.particle');
+      
+      function moveParticles() {
+        particles.forEach(particle => {
+          // 데이터셋에서 현재 위치 및 속도 가져오기
+          let x = parseFloat(particle.dataset.x);
+          let y = parseFloat(particle.dataset.y);
+          let speedX = parseFloat(particle.dataset.speedX);
+          let speedY = parseFloat(particle.dataset.speedY);
+          
+          // 위치 업데이트
+          x += speedX;
+          y += speedY;
+          
+          // 요소의 폭과 높이 가져오기
+          const width = parseFloat(particle.style.width);
+          const height = parseFloat(particle.style.height);
+          
+          // 경계 확인 및 반사 효과
+          if (x <= 0 || x >= window.innerWidth - width) {
+            speedX *= -1; // 방향 반전
+            particle.dataset.speedX = speedX;
+          }
+          
+          if (y <= 0 || y >= window.innerHeight - height) {
+            speedY *= -1; // 방향 반전
+            particle.dataset.speedY = speedY;
+          }
+          
+          // 업데이트된 위치 저장
+          particle.dataset.x = x;
+          particle.dataset.y = y;
+          
+          // 새 위치 적용 (transform 사용으로 성능 향상)
+          particle.style.transform = `translate(${x}px, ${y}px)`;
+        });
+        
+        requestAnimationFrame(moveParticles);
+      }
+      
+      moveParticles();
+    }
+
+    // 카테고리 태그 생성
+    function generateCategoryTags() {
+      const categoryContainer = document.getElementById('categoryTags');
+      const categories = [...new Set(ITEMS.map(item => item.category))];
+      
+      // "전체" 카테고리 추가
+      const allTag = document.createElement('div');
+      allTag.className = 'category-pill active';
+      allTag.textContent = '전체';
+      allTag.dataset.category = 'all';
+      allTag.addEventListener('click', function() {
+        document.querySelectorAll('.category-pill').forEach(pill => pill.classList.remove('active'));
+        this.classList.add('active');
+        document.getElementById('filterCategory').value = 'all';
+        filterItems();
+      });
+      categoryContainer.appendChild(allTag);
+      
+      // 다른 카테고리 추가
+      categories.forEach(category => {
+        const tag = document.createElement('div');
+        tag.className = 'category-pill';
+        tag.textContent = getCategoryKoreanName(category);
+        tag.dataset.category = category;
+        tag.addEventListener('click', function() {
+          document.querySelectorAll('.category-pill').forEach(pill => pill.classList.remove('active'));
+          this.classList.add('active');
+          document.getElementById('filterCategory').value = category;
+          filterItems();
+        });
+        categoryContainer.appendChild(tag);
+      });
+    }
+
+    function getCategoryKoreanName(category) {
+      switch(category) {
+        case 'DS': return '닌텐도 DS';
+        case 'Wii': return '닌텐도 Wii';
+        case 'VPN': return 'VPN / 프록시';
+        case 'Other': return '기타';
+        default: return category;
+      }
+    }
+
+    // 아이템 렌더링
+    function renderItems(items) {
+      const grid = document.getElementById('itemsGrid');
+      const list = document.getElementById('itemsList');
+      grid.innerHTML = '';
+      list.innerHTML = '';
+      
+      if (items.length === 0) {
+        const noResults = document.createElement('div');
+        noResults.className = 'no-results';
+        noResults.innerHTML = '<i class="fas fa-search"></i> 검색 결과가 없습니다';
+        grid.appendChild(noResults);
+        return;
+      }
+      
+      // 그리드 뷰 렌더링
+      items.forEach((item, index) => {
+        const card = document.createElement('div');
+        card.className = 'glass-card item-card';
+        card.setAttribute('data-id', index);
+        card.innerHTML = `
+          <div class="item-header">
+            <img src="${item.icon}" alt="${item.title}" class="item-icon">
+            <div class="item-title">${item.title}</div>
+          </div>
+          <div class="item-buttons">
+            <button class="item-button" data-url="${item.url}" data-tooltip="바로 다운로드 또는 방문">
+              <i class="fas fa-download"></i> 다운로드
+            </button>
+            <button class="favorite-btn" data-id="${index}" data-tooltip="즐겨찾기에 추가">
+              <i class="far fa-heart"></i>
+            </button>
+          </div>
+        `;
+        
+        grid.appendChild(card);
+        
+        // 버튼에 클릭 이벤트 추가
+        const button = card.querySelector('.item-button');
+        button.addEventListener('click', function(e) {
+          createRipple(e);
+          window.open(item.url, '_blank');
+        });
+        
+        // 즐겨찾기 버튼 기능 추가
+        const favBtn = card.querySelector('.favorite-btn');
+        favBtn.addEventListener('click', function() {
+          toggleFavorite(index);
+        });
+        
+        // 순차적인 페이드인 애니메이션
+        setTimeout(() => {
+          card.style.opacity = '1';
+          card.style.transform = 'translateY(0)';
+        }, 70 * index);
+      });
+      
+      // 리스트 뷰 렌더링
+      items.forEach((item, index) => {
+        const row = document.createElement('div');
+        row.className = 'item-row';
+        row.setAttribute('data-id', index);
+        row.innerHTML = `
+          <img src="${item.icon}" alt="${item.title}" class="item-icon">
+          <div class="item-title">${item.title}</div>
+          <div class="item-buttons">
+            <button class="item-button" data-url="${item.url}">
+              <i class="fas fa-download"></i> 다운로드
+            </button>
+            <button class="favorite-btn" data-id="${index}">
+              <i class="far fa-heart"></i>
+            </button>
+          </div>
+        `;
+        
+        list.appendChild(row);
+        
+        // 버튼에 클릭 이벤트 추가
+        const button = row.querySelector('.item-button');
+        button.addEventListener('click', function(e) {
+          createRipple(e);
+          window.open(item.url, '_blank');
+        });
+        
+        // 즐겨찾기 버튼 기능 추가
+        const favBtn = row.querySelector('.favorite-btn');
+        favBtn.addEventListener('click', function() {
+          toggleFavorite(index);
+        });
+        
+        // 순차적인 페이드인 애니메이션
+        setTimeout(() => {
+          row.style.opacity = '1';
+          row.style.transform = 'translateX(0)';
+        }, 70 * index);
+      });
+      
+      // 즐겨찾기 확인
+      updateFavoriteButtons();
+    }
+
+    // 즐겨찾기 토글
+    function toggleFavorite(index) {
+      const isFavorite = favorites.includes(index);
+      
+      if (isFavorite) {
+        // 즐겨찾기에서 제거
+        favorites = favorites.filter(id => id !== index);
+      } else {
+        // 즐겨찾기에 추가
+        favorites.push(index);
+      }
+      
+      // 저장
+      saveToLocalStorage();
+      
+      // UI 업데이트
+      updateFavoriteButtons();
+      renderFavorites();
+    }
+
+    // 즐겨찾기 확인 및 버튼 업데이트
+    function updateFavoriteButtons() {
+      const favButtons = document.querySelectorAll('.favorite-btn');
+      
+      favButtons.forEach(btn => {
+        const itemId = parseInt(btn.getAttribute('data-id'));
+        const isFavorite = favorites.includes(itemId);
+        
+        if (isFavorite) {
+          btn.classList.add('active');
+          btn.querySelector('i').className = 'fas fa-heart';
+          btn.setAttribute('data-tooltip', '즐겨찾기에서 제거');
+        } else {
+          btn.classList.remove('active');
+          btn.querySelector('i').className = 'far fa-heart';
+          btn.setAttribute('data-tooltip', '즐겨찾기에 추가');
+        }
+      });
+    }
+
+    // 즐겨찾기 섹션 렌더링
+    function renderFavorites() {
+      const favSection = document.getElementById('favoritesSection');
+      const favGrid = document.getElementById('favoritesGrid');
+      
+      if (favorites.length === 0) {
+        favSection.style.display = 'none';
+        return;
+      }
+      
+      favSection.style.display = 'block';
+      favGrid.innerHTML = '';
+      
+      const favoriteItems = ITEMS.filter((item, index) => favorites.includes(index));
+      
+      favoriteItems.forEach((item, index) => {
+        const originalIndex = ITEMS.findIndex(i => i.title === item.title);
+        const card = document.createElement('div');
+        card.className = 'glass-card item-card';
+        card.setAttribute('data-id', originalIndex);
+        card.innerHTML = `
+          <div class="item-header">
+            <img src="${item.icon}" alt="${item.title}" class="item-icon">
+            <div class="item-title">${item.title}</div>
+          </div>
+          <div class="item-buttons">
+            <button class="item-button" data-url="${item.url}">
+              <i class="fas fa-download"></i> 다운로드
+            </button>
+            <button class="favorite-btn active" data-id="${originalIndex}">
+              <i class="fas fa-heart"></i>
+            </button>
+          </div>
+        `;
+        
+        favGrid.appendChild(card);
+        
+        // 버튼에 클릭 이벤트 추가
+        const button = card.querySelector('.item-button');
+        button.addEventListener('click', function(e) {
+          createRipple(e);
+          window.open(item.url, '_blank');
+        });
+        
+        // 즐겨찾기 버튼 기능 추가
+        const favBtn = card.querySelector('.favorite-btn');
+        favBtn.addEventListener('click', function() {
+          toggleFavorite(originalIndex);
+        });
+        
+        // 애니메이션
+        card.style.opacity = '1';
+        card.style.transform = 'translateY(0)';
+      });
+    }
+
+    // 로드 시 즐겨찾기 체크
+    function checkFavorites() {
+      updateFavoriteButtons();
+      renderFavorites();
+    }
+
+    // 검색 및 필터링 기능
+    const searchInput = document.getElementById('searchInput');
+    searchInput.addEventListener('input', debounce(filterItems, 300));
+
+    function filterItems() {
+      const query = searchInput.value.toLowerCase().trim();
+      const category = document.getElementById('filterCategory').value;
+      
+      let filteredItems = ITEMS;
+      
+      // 검색어로 필터링
+      if (query) {
+        filteredItems = filteredItems.filter(item => 
+          item.title.toLowerCase().includes(query)
+        );
+      }
+      
+      // 카테고리로 필터링
+      if (category !== 'all') {
+        filteredItems = filteredItems.filter(item => 
+          item.category === category
+        );
+      }
+      
+      renderItems(filteredItems);
+    }
+
+    // 뷰 전환 (그리드/리스트)
+    function switchView(viewType) {
+      const gridView = document.getElementById('itemsGrid');
+      const listView = document.getElementById('itemsList');
+      const gridBtn = document.getElementById('gridViewBtn');
+      const listBtn = document.getElementById('listViewBtn');
+      
+      if (viewType === 'grid') {
+        gridView.style.display = 'grid';
+        listView.style.display = 'none';
+        gridBtn.classList.add('active');
+        listBtn.classList.remove('active');
+      } else {
+        gridView.style.display = 'none';
+        listView.style.display = 'flex';
+        gridBtn.classList.remove('active');
+        listBtn.classList.add('active');
+      }
+    }
+
+    // 테마 토글
+    function toggleTheme() {
+      const body = document.body;
+      const themeIcon = document.querySelector('#themeToggle i');
+      
+      if (body.classList.contains('light-mode')) {
+        body.classList.remove('light-mode');
+        themeIcon.className = 'fas fa-moon';
+      } else {
+        body.classList.add('light-mode');
+        themeIcon.className = 'fas fa-sun';
+      }
+      
+      // 세션 전용 테마 설정
+    }
+
+    // 테마 확인 (샌드박스 환경에서 비활성화)
+    function loadSavedTheme() {
+      // 샌드박스 환경에서 테마 유지 불가
+      const themeIcon = document.querySelector('#themeToggle i');
+      // 기본 다크 테마
+      themeIcon.className = 'fas fa-moon';
+    }
+
+    // 백투탑 기능
+    function toggleBackToTop() {
+      const backToTopBtn = document.getElementById('backToTop');
+      
+      if (window.scrollY > 300) {
+        backToTopBtn.classList.add('visible');
+      } else {
+        backToTopBtn.classList.remove('visible');
+      }
+    }
+
+    function scrollToTop() {
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
+    }
+
+    // 키보드 단축키
+    function handleKeyboardShortcuts(e) {
+      // 입력 필드에서는 처리하지 않음
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+        return;
+      }
+      
+      switch(e.key) {
+        case '/':
+          e.preventDefault();
+          searchInput.focus();
+          break;
+        case 'g':
+        case 'G':
+          switchView('grid');
+          break;
+        case 'l':
+        case 'L':
+          switchView('list');
+          break;
+        case 'f':
+        case 'F':
+          const favSection = document.getElementById('favoritesSection');
+          favSection.style.display = favSection.style.display === 'none' ? 'block' : 'none';
+          break;
+        case 't':
+        case 'T':
+          toggleTheme();
+          break;
+        case '?':
+          document.getElementById('shortcutsModal').style.display = 'flex';
+          break;
+        case 'Escape':
+          document.getElementById('shortcutsModal').style.display = 'none';
+          break;
+        case 'ArrowUp':
+          if (e.ctrlKey) {
+            e.preventDefault();
+            scrollToTop();
+          }
+          break;
+        case ' ':
+          if (e.target === document.body) {
+            e.preventDefault();
+            window.scrollBy(0, window.innerHeight * 0.8);
+          }
+          break;
+      }
+    }
