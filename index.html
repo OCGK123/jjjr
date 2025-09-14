@@ -3,8 +3,22 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>진채형 파일 아카이브</title>
-
+  <title>진채형 파일아카이브</title>
+  <link rel="icon" href="icon.png" type="image/png">
+  <meta name="description" content="에뮬레이터, VPN, 웹 포팅 게임들을 빠르게 설치할 수 있는 아카이브">
+  <meta name="keywords" content="에뮬레이터, VPN, 웹 포팅 게임, 파일 아카이브">
+  <meta name="author" content="- 진채형 -">
+  <meta property="og:title" content="진채형 파일아카이브">
+  <meta property="og:description" content="에뮬레이터, VPN, 웹 포팅 게임들을 빠르게 설치할 수 있는 아카이브">
+  <meta property="og:image" content="icon.png">
+  <meta property="og:url" content="">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="진채형 파일아카이브">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="진채형 파일아카이브">
+  <meta name="twitter:description" content="에뮬레이터, VPN, 웹 포팅 게임들을 빠르게 설치할 수 있는 아카이브">
+  <meta name="twitter:image" content="icon.png">
+  <script src="https://iframe.chat/scripts/main.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   <style>
@@ -66,7 +80,6 @@
       user-select: text;
     }
 
-    /* 개발자도구 방지 */
     body {
       -webkit-touch-callout: none;
       -webkit-user-select: none;
@@ -93,7 +106,6 @@
       position: relative;
     }
 
-    /* 새로운 메인 배경 */
     body::before {
       content: '';
       position: fixed;
@@ -126,7 +138,6 @@
       transition: opacity 0.3s ease, visibility 0.3s ease;
     }
 
-    /* 최대화시 배경 숨기기 */
     body.maximized-mode::before,
     body.maximized-mode::after {
       opacity: 0;
@@ -136,8 +147,10 @@
     body.maximized-mode .header,
     body.maximized-mode .search-section,
     body.maximized-mode .category-section,
+    body.maximized-mode .featured-section,
     body.maximized-mode .content-section,
-    body.maximized-mode .scroll-top {
+    body.maximized-mode .scroll-top,
+    body.maximized-mode .chat-widget {
       opacity: 0;
       visibility: hidden;
       pointer-events: none;
@@ -158,10 +171,26 @@
       inset: 0;
       background: var(--bg-primary);
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
       z-index: 9999;
       transition: opacity 0.3s ease;
+    }
+
+    .loading-icon {
+      width: 80px;
+      height: 80px;
+      margin-bottom: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: loadingPulse 2s infinite;
+    }
+
+    .loading-icon img {
+      width: 60px;
+      height: 60px;
     }
 
     .loading-dots {
@@ -186,7 +215,6 @@
       40% { opacity: 1; transform: scale(1.2); }
     }
 
-    /* 새로운 로그인 배경 */
     .login-screen {
       position: fixed;
       inset: 0;
@@ -237,6 +265,21 @@
       box-shadow: 0 25px 50px rgba(0, 0, 0, 0.6);
       transform: translateY(20px);
       animation: slideInUp 1s ease forwards;
+      text-align: center;
+    }
+
+    .login-logo {
+      width: 80px;
+      height: 80px;
+      margin: 0 auto 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .login-logo img {
+      width: 60px;
+      height: 60px;
     }
 
     @keyframes slideInUp {
@@ -252,14 +295,12 @@
       margin-bottom: 16px;
       letter-spacing: -0.01em;
       color: white;
-      text-align: center;
     }
 
     .login-subtitle {
       font-size: 16px;
       color: rgba(255, 255, 255, 0.8);
       margin-bottom: 50px;
-      text-align: center;
     }
 
     .login-field {
@@ -383,7 +424,6 @@
       to { opacity: 1; }
     }
 
-    /* 완전히 새로운 레이아웃 */
     .header {
       padding: 40px 30px 20px;
       text-align: center;
@@ -410,7 +450,6 @@
       margin-bottom: 0;
     }
 
-    /* 새로운 검색 섹션 레이아웃 */
     .search-section {
       padding: 30px 30px 40px;
       background: rgba(255, 255, 255, 0.03);
@@ -488,14 +527,12 @@
       box-shadow: var(--shadow-sm);
     }
 
-    /* 셀렉트박스 옵션 스타일 */
     .filter-select option {
       background-color: white;
       color: black;
       padding: 10px;
     }
 
-    /* 카테고리 섹션 새 디자인 */
     .category-section {
       padding: 20px 30px 30px;
       background: transparent;
@@ -534,7 +571,118 @@
       box-shadow: var(--shadow-lg);
     }
 
-    /* 컨텐츠 섹션 새 레이아웃 */
+    .featured-section {
+      padding: 30px 30px 20px;
+      background: transparent;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      margin-bottom: 20px;
+    }
+
+    .featured-container {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .featured-title {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 25px;
+      text-align: center;
+      background: linear-gradient(135deg, #ffffff 0%, #e0e0e0 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .featured-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+      gap: 25px;
+    }
+
+    .featured-card {
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: var(--blur-lg);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 25px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: var(--transition-slow);
+      box-shadow: 0 15px 50px rgba(0, 0, 0, 0.4);
+      position: relative;
+      min-height: 400px;
+    }
+
+    .featured-card:hover {
+      transform: translateY(-8px);
+      border-color: rgba(255, 255, 255, 0.25);
+      box-shadow: 0 25px 70px rgba(0, 0, 0, 0.5);
+    }
+
+    .featured-image {
+      width: 100%;
+      height: 250px;
+      object-fit: cover;
+      border-radius: 25px 25px 0 0;
+    }
+
+    .featured-content {
+      padding: 35px;
+      position: relative;
+    }
+
+    .featured-item-title {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 15px;
+      line-height: 1.3;
+    }
+
+    .featured-description {
+      font-size: 16px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+      margin-bottom: 25px;
+    }
+
+    .featured-badge {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: rgba(255, 215, 0, 0.9);
+      color: #000;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .featured-play-btn {
+      width: 100%;
+      height: 55px;
+      background: linear-gradient(135deg, #ffffff 0%, #f0f0f0 100%);
+      color: #000;
+      border: none;
+      border-radius: 15px;
+      font-size: 18px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+    }
+
+    .featured-play-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px rgba(255, 255, 255, 0.3);
+    }
+
     .content-section {
       padding: 20px 30px 100px;
       background: transparent;
@@ -557,7 +705,6 @@
       to { opacity: 1; }
     }
 
-    /* 카드 디자인 대폭 개선 */
     .item-card {
       background: rgba(255, 255, 255, 0.06);
       backdrop-filter: var(--blur-lg);
@@ -606,7 +753,6 @@
       border-radius: 15px;
       object-fit: cover;
       border: 2px solid rgba(255, 255, 255, 0.2);
-      background: var(--bg-secondary);
       transition: var(--transition);
       box-shadow: var(--shadow-sm);
     }
@@ -668,7 +814,6 @@
       background: rgba(239, 68, 68, 0.15);
     }
 
-    /* 최소화된 창들 */
     .minimized-windows {
       position: fixed;
       left: 25px;
@@ -730,7 +875,31 @@
       margin-top: 10px;
     }
 
-    /* IFRAME 창 개선 */
+    .icon-tooltip {
+      position: absolute;
+      left: 80px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: rgba(0, 0, 0, 0.9);
+      backdrop-filter: var(--blur-md);
+      color: white;
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      white-space: nowrap;
+      opacity: 0;
+      visibility: hidden;
+      transition: var(--transition);
+      z-index: 2000;
+      pointer-events: none;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .minimized-icon:hover .icon-tooltip {
+      opacity: 1;
+      visibility: visible;
+    }
+
     .window-container {
       position: fixed;
       z-index: 2000;
@@ -851,7 +1020,6 @@
       border-radius: 0 0 15px 0;
     }
 
-    /* 빈 상태 */
     .empty-state {
       text-align: center;
       padding: 100px 30px;
@@ -882,11 +1050,10 @@
       color: var(--text-muted);
     }
 
-    /* 스크롤 탑 버튼 */
     .scroll-top {
       position: fixed;
       bottom: 40px;
-      right: 40px;
+      right: 130px;
       width: 60px;
       height: 60px;
       background: rgba(255, 255, 255, 0.1);
@@ -916,7 +1083,124 @@
       background: rgba(255, 255, 255, 0.15);
     }
 
-    /* 애니메이션 */
+    .chat-widget {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 400px;
+      height: 500px;
+      background: rgba(22, 22, 22, 0.95);
+      backdrop-filter: var(--blur-lg);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 20px;
+      display: none;
+      flex-direction: column;
+      overflow: hidden;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+      z-index: 1000;
+      transition: var(--transition-slow);
+    }
+
+    .chat-widget.active {
+      display: flex;
+    }
+
+    .chat-header {
+      padding: 20px;
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: var(--blur-md);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .chat-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .chat-close {
+      width: 30px;
+      height: 30px;
+      background: rgba(255, 255, 255, 0.1);
+      border: none;
+      border-radius: 8px;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .chat-close:hover {
+      background: rgba(255, 255, 255, 0.2);
+      color: var(--text-primary);
+    }
+
+    .chat-content {
+      flex: 1;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+
+    .chat-placeholder {
+      color: var(--text-secondary);
+      margin-bottom: 20px;
+    }
+
+    .chat-link {
+      padding: 12px 24px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 12px;
+      color: var(--text-primary);
+      text-decoration: none;
+      transition: var(--transition);
+    }
+
+    .chat-link:hover {
+      background: rgba(255, 255, 255, 0.15);
+      border-color: rgba(255, 255, 255, 0.3);
+    }
+
+    .chat-toggle {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 60px;
+      height: 60px;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: var(--blur-md);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 50%;
+      color: var(--text-primary);
+      cursor: pointer;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1001;
+      font-size: 24px;
+      box-shadow: var(--shadow-glass);
+    }
+
+    .chat-toggle:hover {
+      transform: scale(1.1);
+      background: rgba(255, 255, 255, 0.15);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .chat-widget.active + .chat-toggle {
+      display: none;
+    }
+
     @keyframes minimizeToIcon {
       0% {
         opacity: 1;
@@ -954,7 +1238,6 @@
       animation: slideDown 0.3s ease;
     }
 
-    /* 반응형 디자인 */
     @media (max-width: 768px) {
       .search-container {
         flex-direction: column;
@@ -977,6 +1260,10 @@
         gap: 20px;
       }
 
+      .featured-grid {
+        grid-template-columns: 1fr;
+      }
+
       .minimized-windows {
         left: 20px;
       }
@@ -996,6 +1283,24 @@
       .hero-title {
         font-size: clamp(32px, 8vw, 48px);
       }
+
+      .chat-widget {
+        width: 90vw;
+        right: 5vw;
+        left: 5vw;
+      }
+
+      .featured-card {
+        min-height: 350px;
+      }
+
+      .featured-image {
+        height: 200px;
+      }
+
+      .scroll-top {
+        right: 90px;
+      }
     }
 
     .error-shake {
@@ -1007,10 +1312,62 @@
       10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
       20%, 40%, 60%, 80% { transform: translateX(5px); }
     }
+
+    .window-container,
+    .item-card,
+    .minimized-icon,
+    .chat-widget {
+      will-change: transform;
+      transform: translateZ(0);
+    }
+
+    .items-grid,
+    .category-list {
+      contain: layout style paint;
+    }
+
+    .window-iframe {
+      will-change: auto;
+      contain: layout style paint;
+    }
+
+    body.maximized-mode * {
+      pointer-events: none;
+    }
+
+    body.maximized-mode .window-container.active,
+    body.maximized-mode .window-container.active * {
+      pointer-events: auto;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+
+    .window-container:not(.active) .window-iframe {
+      visibility: hidden;
+    }
+
+    @media (pointer: coarse) {
+      .window-btn,
+      .action-btn,
+      .category-tag,
+      .chat-toggle {
+        min-height: 44px;
+        min-width: 44px;
+      }
+    }
   </style>
 </head>
 <body>
   <div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-icon">
+      <img src="icon.png" alt="로딩 아이콘" onerror="if(!this.dataset.failed){this.dataset.failed='true';this.style.display='none';}">
+    </div>
     <div class="loading-dots">
       <div class="loading-dot"></div>
       <div class="loading-dot"></div>
@@ -1021,6 +1378,9 @@
   <div class="login-screen" id="loginScreen">
     <div class="login-left">
       <div class="login-card">
+        <div class="login-logo">
+          <img src="icon.png" alt="로고" onerror="if(!this.dataset.failed){this.dataset.failed='true';this.style.display='none';}">
+        </div>
         <h1 class="login-title">로그인</h1>
         <p class="login-subtitle">아카이브에 접근하려면 비밀번호를 입력하세요</p>
         <div class="login-field">
@@ -1084,6 +1444,13 @@
       <div class="category-list" id="categoryList"></div>
     </section>
 
+    <section class="featured-section" id="featuredSection">
+      <div class="featured-container">
+        <h2 class="featured-title">추천</h2>
+        <div class="featured-grid" id="featuredGrid"></div>
+      </div>
+    </section>
+
     <main class="content-section">
       <div class="content-container">
         <div class="items-grid" id="itemsGrid"></div>
@@ -1099,14 +1466,48 @@
     <button class="scroll-top" id="scrollTop">
       <i class="fas fa-arrow-up"></i>
     </button>
+
+    <div class="chat-widget" id="chatWidget">
+      <div class="chat-header">
+        <h3 class="chat-title">채팅</h3>
+        <button class="chat-close" id="chatClose">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="chat-content">
+        <iframe id="chatFrame" src="https://iframe.chat/embed?chat=10836812" style="width: 100%; height: 100%; border: none; border-radius: 10px; background: rgba(255,255,255,0.1);"></iframe>
+
+      </div>
+    </div>
+
+    <button class="chat-toggle" id="chatToggle">
+      <i class="fas fa-comments"></i>
+    </button>
   </div>
 
   <script>
+    const FEATURED_ITEMS = [
+      {
+        title: "태고의 달인",
+        image: "https://www.gematsu.com/wp-content/uploads/2022/02/Game-Page-Featured_Taiko-no-Tatsujin-Rhythm-Festival-Inits.jpg",
+        description: "태고의 달인은 커다란 북을 두드리며 빨간색과 파란색을 박자에 맞춰 치는 일본식 리듬게임입니다! J-POP,애니음악,게임음악,대중음악 등 다양한 곡과 여러 난이도를 지원해 혼자나 친구랑 같이 편하게 할 수 있어요!",
+        url: "https://cjdgrevival.com/",
+        iframe: true
+      },
+      {
+        title: "언더테일",
+        image: "https://i.pinimg.com/736x/9a/2a/a3/9a2aa3ccba5c3bce83e2e3f0a607c147.jpg",
+        description: "독창적인 스토리텔링과 선택의 중요성을 강조하는 인디 RPG 게임이에요. 언더테일은 플레이어가 몬스터와 싸움 대신 설득하거나 친해지며 선택에 따라 다양한 결말을 경험하는 게임이에요!",
+        url: "https://www.autistici.org/burnedprojects/UNDERTALE/",
+        iframe: true
+      }
+    ];
+
     const GAME_DATA = [
       {
         icon: "https://tse3.mm.bing.net/th/id/OIP.t8f1Eq2m6okGkEGyrSRJvAHaEK?w=309&h=180&c=7&r=0&o=5&pid=1.7",
-        title: "프로톤VPN (가입필요)",
-        url: "https://vpn.protondownload.com/download/ProtonVPN_v3.3.2.exe",
+        title: "프로톤VPN",
+        url: "https://github.com/ProtonVPN/win-app/releases/download/4.2.1/ProtonVPN_v4.2.1_x64.exe",
         category: "VPN",
         iframe: false
       },
@@ -1293,7 +1694,7 @@
         iframe: false
       },
       {
-        icon: "https://i.namu.wiki/i/YlUne4SpGZJbhOeuD-8UKwOYd1EEUGPWqWPi5M7x0t2h1pNRqpZ4W90WIH69_ohQeTaZlWe92XsYu1hCyun-A.webp",
+        icon: "https://i.namu.wiki/i/YlUne4SpGZJbhOeuD-8UKwOYd1EEUefi4GHx5cDERVgg.webp",
         title: "포켓몬 블랙2(DS)",
         url: "https://drive.usercontent.google.com/download?id=1Xe6ENFnIU2Ydu-ResrDFnhucQFoD90c6&export=download&authuser=0",
         category: "DS",
@@ -1444,7 +1845,7 @@
         title: "벅샷룰렛",
         url: "https://buckshotroulette.online/game/ver15/",
         category: "Other",
-        iframe: false  // IFRAME에서 일반 링크로 변경
+        iframe: false
       },
       {
         icon: "https://static.independent.co.uk/2021/07/15/13/A16I9125-Edit.jpg?width=1200&height=1200&fit=crop",
@@ -1497,7 +1898,6 @@
       }
     ];
 
-    // 초성 검색 함수
     function getKoreanInitials(str) {
       const initials = [
         'ㄱ', 'ㄲ', 'ㄴ', 'ㄷ', 'ㄸ', 'ㄹ', 'ㅁ', 'ㅂ', 'ㅃ',
@@ -1513,7 +1913,6 @@
       }).join('');
     }
 
-    // 타이핑 애니메이션 클래스
     class TypingAnimation {
       constructor(element, texts, options = {}) {
         this.element = element;
@@ -1561,7 +1960,6 @@
       }
     }
 
-    // 완전히 개선된 윈도우 매니저
     class WindowManager {
       constructor() {
         this.windows = new Map();
@@ -1642,7 +2040,6 @@
         
         this.dragState.element = null;
         
-        // IFRAME에 포커스 복원
         this.focusActiveIframe();
       }
 
@@ -1652,7 +2049,6 @@
           if (container && container.classList.contains('active')) {
             const iframe = container.querySelector('.window-iframe');
             if (iframe) {
-              // IFRAME에 포커스를 주어 키보드 입력 받을 수 있게 함
               setTimeout(() => {
                 iframe.focus();
                 iframe.contentWindow?.focus();
@@ -1663,7 +2059,6 @@
       }
 
       openWindow(item) {
-        // 이미 열린 창 확인
         for (let [id, window] of this.windows) {
           if (window.url === item.url) {
             if (this.minimizedWindows.has(id)) {
@@ -1744,10 +2139,8 @@
         const maximizeBtn = container.querySelector('.maximize-btn');
         const iframe = container.querySelector('.window-iframe');
 
-        // 드래그 시작
         header.addEventListener('mousedown', (e) => this.startDrag(e, container, windowData));
 
-        // 윈도우 컨트롤
         closeBtn.addEventListener('click', (e) => {
           e.stopPropagation();
           this.closeWindow(windowData.id);
@@ -1763,7 +2156,6 @@
           this.toggleMaximize(windowData.id);
         });
 
-        // IFRAME 로드 후 포커스 설정
         iframe.addEventListener('load', () => {
           setTimeout(() => {
             if (this.activeWindow === windowData.id) {
@@ -1773,14 +2165,12 @@
           }, 200);
         });
 
-        // 창 클릭 시 포커스
         container.addEventListener('mousedown', (e) => {
           if (!e.target.closest('.window-controls')) {
             this.focusWindow(windowData.id);
           }
         });
 
-        // IFRAME 클릭 시 포커스 유지
         iframe.addEventListener('mouseenter', () => {
           if (this.activeWindow === windowData.id) {
             setTimeout(() => {
@@ -1834,7 +2224,6 @@
         if (container) {
           container.style.zIndex = windowData.zIndex;
           
-          // IFRAME에 포커스 설정
           const iframe = container.querySelector('.window-iframe');
           if (iframe) {
             setTimeout(() => {
@@ -1942,7 +2331,6 @@
         
         document.body.classList.add('maximized-mode');
         
-        // 최대화 후 IFRAME에 포커스
         setTimeout(() => {
           this.focusActiveIframe();
         }, 100);
@@ -2023,7 +2411,12 @@
             img.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiByeD0iOCIgZmlsbD0iIzE2MTYxNiIvPgo8cGF0aCBkPSJNMjAgMTBWMzBNMTAgMjBIMzAiIHN0cm9rZT0iIzczNzM3MyIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiLz4KPC9zdmc+';
           };
           
+          const tooltip = document.createElement('div');
+          tooltip.className = 'icon-tooltip';
+          tooltip.textContent = windowData.title;
+          
           icon.appendChild(img);
+          icon.appendChild(tooltip);
           tray.appendChild(icon);
         });
 
@@ -2040,14 +2433,13 @@
       }
     }
 
-    // 메인 애플리케이션 클래스
     class ArchiveApp {
       constructor() {
         this.windowManager = new WindowManager();
         this.favorites = this.loadFavorites();
         this.currentCategory = 'all';
         this.searchQuery = '';
-        this.PASSWORD = 'vkdlfdkzkdlqm';
+        this.secretPassphrase = 'wlswlswkfkwlflwlflwks';
         this.init();
       }
 
@@ -2057,6 +2449,7 @@
         this.showLoading();
         this.initTypingAnimation();
         this.disableDevTools();
+        this.initChatSystem();
       }
 
       disableDevTools() {
@@ -2102,9 +2495,16 @@
           categoryFilter: document.getElementById('categoryFilter'),
           categoryList: document.getElementById('categoryList'),
           
+          featuredSection: document.getElementById('featuredSection'),
+          featuredGrid: document.getElementById('featuredGrid'),
+          
           itemsGrid: document.getElementById('itemsGrid'),
           emptyState: document.getElementById('emptyState'),
-          scrollTop: document.getElementById('scrollTop')
+          scrollTop: document.getElementById('scrollTop'),
+          
+          chatWidget: document.getElementById('chatWidget'),
+          chatToggle: document.getElementById('chatToggle'),
+          chatClose: document.getElementById('chatClose')
         };
       }
 
@@ -2113,7 +2513,6 @@
           const saved = localStorage.getItem('archiveFavorites');
           return saved ? new Set(JSON.parse(saved)) : new Set();
         } catch (error) {
-          console.error('즐겨찾기 로드 실패:', error);
           return new Set();
         }
       }
@@ -2122,7 +2521,6 @@
         try {
           localStorage.setItem('archiveFavorites', JSON.stringify(Array.from(this.favorites)));
         } catch (error) {
-          console.error('즐겨찾기 저장 실패:', error);
         }
       }
 
@@ -2137,6 +2535,7 @@
           clearTimeout(searchTimeout);
           searchTimeout = setTimeout(() => {
             this.searchQuery = e.target.value.toLowerCase().trim();
+            this.updateFeaturedVisibility();
             this.renderItems();
           }, 300);
         });
@@ -2153,6 +2552,16 @@
         });
       }
 
+      initChatSystem() {
+        this.elements.chatToggle.addEventListener('click', () => {
+          this.elements.chatWidget.classList.add('active');
+        });
+
+        this.elements.chatClose.addEventListener('click', () => {
+          this.elements.chatWidget.classList.remove('active');
+        });
+      }
+
       showLoading() {
         setTimeout(() => {
           this.elements.loadingOverlay.style.opacity = '0';
@@ -2164,7 +2573,7 @@
 
       validatePassword() {
         const input = this.elements.passwordInput;
-        if (input.value === this.PASSWORD) {
+        if (input.value === this.secretPassphrase) {
           this.elements.loginScreen.style.opacity = '0';
           setTimeout(() => {
             this.elements.loginScreen.style.display = 'none';
@@ -2184,6 +2593,8 @@
 
       initializeApp() {
         this.generateCategoryTags();
+        this.renderFeatured();
+        this.updateFeaturedVisibility();
         this.renderItems();
       }
 
@@ -2210,6 +2621,50 @@
         });
       }
 
+      renderFeatured() {
+        this.elements.featuredGrid.innerHTML = '';
+        
+        FEATURED_ITEMS.forEach((item, index) => {
+          const card = document.createElement('div');
+          card.className = 'featured-card';
+          card.innerHTML = `
+            <div class="featured-badge">추천</div>
+            <img src="${item.image}" alt="${item.title}" class="featured-image">
+            <div class="featured-content">
+              <h3 class="featured-item-title">${item.title}</h3>
+              <p class="featured-description">${item.description}</p>
+              <button class="featured-play-btn" data-index="${index}">
+                <i class="fas fa-play"></i>
+                지금 플레이하기
+              </button>
+            </div>
+          `;
+
+          const playBtn = card.querySelector('.featured-play-btn');
+          playBtn.addEventListener('click', () => {
+            this.handleFeaturedClick(item);
+          });
+
+          this.elements.featuredGrid.appendChild(card);
+        });
+      }
+
+      handleFeaturedClick(item) {
+        if (item.iframe) {
+          this.windowManager.openWindow(item);
+        } else {
+          const newWindow = window.open(item.url, '_blank', 'noopener,noreferrer');
+          if (!newWindow) {
+            this.showNotification('팝업이 차단되었습니다. 브라우저 설정에서 팝업을 허용해주세요.');
+          }
+        }
+      }
+
+      updateFeaturedVisibility() {
+        const shouldShow = this.currentCategory === 'all' && this.searchQuery === '';
+        this.elements.featuredSection.style.display = shouldShow ? 'block' : 'none';
+      }
+
       selectCategory(category) {
         this.currentCategory = category;
         this.elements.categoryFilter.value = category;
@@ -2218,6 +2673,7 @@
           tag.classList.toggle('active', tag.dataset.category === category);
         });
         
+        this.updateFeaturedVisibility();
         this.renderItems();
       }
 
@@ -2264,7 +2720,6 @@
         
         this.updateFavoriteUI(index);
         
-        // 즐겨찾기 순서로 재정렬
         setTimeout(() => {
           this.renderItems();
         }, 100);
@@ -2341,7 +2796,7 @@
         
         card.innerHTML = `
           <div class="card-header">
-            <img src="${item.icon}" alt="${item.title}" class="item-icon" loading="lazy" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTUiIGhlaWdodD0iNTUiIHZpZXdCb3g9IjAgMCA1NSA1NSIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjU1IiBoZWlnaHQ9IjU1IiByeD0iMTUiIGZpbGw9IiMxNjE2MTYiLz4KPHN2ZyB4PSIxNSIgeT0iMTUiIHdpZHRoPSIyNSIgaGVpZ2h0PSIyNSIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIj4KPHBhdGggZD0iTTEyIDJMMTMuMDkgOC4yNkwyMSA5TDEzLjA5IDE1Ljc0TDEyIDIyTDEwLjkxIDE1Ljc0TDMgOUwxMC45MSA4LjI2TDEyIDJaIiBzdHJva2U9IiM3Mzc'">
+            <img src="${item.icon}" alt="${item.title}" class="item-icon" loading="lazy" onerror="if(!this.dataset.failed){this.dataset.failed='true';this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTUiIGhlaWdodD0iNTUiIHZpZXdCb3g9IjAgMCA1NSA1NSIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjU1IiBoZWlnaHQ9IjU1IiByeD0iMTUiIGZpbGw9InRyYW5zcGFyZW50Ii8+PHN2ZyB4PSIxNSIgeT0iMTUiIHdpZHRoPSIyNSIgaGVpZ2h0PSIyNSIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIj4KPHBhdGggZD0iTTEyIDJMMTMuMDkgOC4yNkwyMSA5TDEzLjA5IDE1Ljc0TDEyIDIyTDEwLjkxIDE1Ljc0TDMgOUwxMC45MSA4LjI2TDEyIDJaIiBzdHJva2U9IiM3Mzc3MzciLz4KPC9zdmc+PC9zdmc+';}">
             <h3 class="item-title">${item.title}</h3>
           </div>
           <div class="card-actions">
@@ -2404,9 +2859,7 @@
       }
     }
 
-    // 성능 최적화를 위한 추가 설정
     const performanceOptimizations = () => {
-      // 이미지 지연 로딩 강화
       if ('IntersectionObserver' in window) {
         const imageObserver = new IntersectionObserver((entries, observer) => {
           entries.forEach(entry => {
@@ -2421,108 +2874,36 @@
           });
         });
 
-        // 모든 지연 로딩 이미지 관찰
         document.querySelectorAll('img[data-src]').forEach(img => {
           imageObserver.observe(img);
         });
       }
 
-      // 메모리 정리
       window.addEventListener('beforeunload', () => {
-        // 모든 IFRAME 정리
         document.querySelectorAll('.window-iframe').forEach(iframe => {
           iframe.src = '';
         });
         
-        // 이벤트 리스너 정리
         document.removeEventListener('mousemove', null);
         document.removeEventListener('mouseup', null);
         document.removeEventListener('contextmenu', null);
       });
     };
 
-    // DOM 로드 완료 후 초기화
     document.addEventListener('DOMContentLoaded', () => {
-      // 성능 최적화 적용
       performanceOptimizations();
       
-      // 메인 앱 실행
       window.appInstance = new ArchiveApp();
       
-      // 전역 오류 처리
       window.addEventListener('error', (e) => {
-        console.error('애플리케이션 오류:', e.error);
       });
 
-      // 브라우저 호환성 체크
       if (!window.requestAnimationFrame) {
         window.requestAnimationFrame = function(callback) {
           return setTimeout(callback, 1000 / 60);
         };
       }
-
-      console.log('🎮 진채형 파일 아카이브가 성공적으로 로드되었습니다!');
-      console.log('🚀 모든 기능이 정상 작동합니다.');
     });
-
-    // 추가 성능 최적화 스타일
-    const optimizationStyles = document.createElement('style');
-    optimizationStyles.textContent = `
-      /* GPU 가속 최적화 */
-      .window-container,
-      .item-card,
-      .minimized-icon {
-        will-change: transform;
-        transform: translateZ(0);
-      }
-
-      /* 스크롤 성능 최적화 */
-      .items-grid,
-      .category-list {
-        contain: layout style paint;
-      }
-
-      /* IFRAME 성능 최적화 */
-      .window-iframe {
-        will-change: auto;
-        contain: layout style paint;
-      }
-
-      /* 최대화 모드 최적화 */
-      body.maximized-mode * {
-        pointer-events: none;
-      }
-
-      body.maximized-mode .window-container.active,
-      body.maximized-mode .window-container.active * {
-        pointer-events: auto;
-      }
-
-      /* 애니메이션 성능 개선 */
-      @media (prefers-reduced-motion: reduce) {
-        * {
-          animation-duration: 0.01ms !important;
-          animation-iteration-count: 1 !important;
-          transition-duration: 0.01ms !important;
-        }
-      }
-
-      /* 메모리 사용량 최적화 */
-      .window-container:not(.active) .window-iframe {
-        visibility: hidden;
-      }
-
-      /* 터치 디바이스 최적화 */
-      @media (pointer: coarse) {
-        .window-btn,
-        .action-btn,
-        .category-tag {
-          min-height: 44px;
-          min-width: 44px;
-        }
-      }
-    `;
-    document.head.appendChild(optimizationStyles);
   </script>
 </body>
 </html>
